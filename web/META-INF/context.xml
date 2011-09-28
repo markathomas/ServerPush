@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2011 Elihu, LLC. All rights reserved.
+  ~
+  ~ $Id$
+  -->
+<Context path="" reloadable="false" privileged="false" crossContext="true" unpackWAR="false">
+    <Loader delegate="true"/>
+</Context>

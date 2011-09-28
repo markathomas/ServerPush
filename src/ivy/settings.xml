@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: ivyconf.xml 3886 2010-07-28 18:28:57Z mthomas $ -->
+<ivysettings>
+    <resolvers>
+        <url name="local">
+            <ivy      pattern="file:///opt/repo/ivy/[organisation]/[module]/[revision]/ivy.xml"/>
+            <artifact pattern="file:///opt/repo/ivy/[organisation]/[module]/[revision]/[type]s/[artifact].[ext]"/>
+        </url>
+        <packager name="ivyroundup"
+          buildRoot="${user.home}/.ivy2/packager/build"
+          resourceCache="${user.home}/.ivy2/packager/cache">
+            <ivy pattern="http://ivyroundup.googlecode.com/svn/trunk/repo/modules/[organisation]/[module]/[revision]/ivy.xml"/>
+            <artifact pattern="http://ivyroundup.googlecode.com/svn/trunk/repo/modules/[organisation]/[module]/[revision]/packager.xml"/>
+        </packager>
+    </resolvers>
+    <modules>
+        <module organisation=".*" name=".*" resolver="ivyroundup"/>
+    </modules>
+    <caches useOrigin="true"/>
+</ivysettings>
