@@ -1,0 +1,9 @@
+ServerPush for Vaadin uses the Atmosphere Framework by Jeanfrancois Arcand
+https://github.com/Atmosphere/atmosphere
+
+The example in the web/ directory shows how to configure Atmosphere for your web application.
+
+Note that the <url-pattern/> for the Atmosphere servlet must be the same as the context-root attribute in META-INF/atmosphere.xml.
+This value will always be "/server-push"; therefore, in Vaadin, if your custom widgetset is named "mywidgetset"
+then the URL will be <servlet context path>/server-push.
+
