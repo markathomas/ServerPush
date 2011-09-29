@@ -29,6 +29,8 @@ public class ServerPush extends AbstractComponent {
     }
 
     public ServerPush(String contextPath) {
+        if (contextPath == null)
+            contextPath = "";
         this.contextPath = contextPath;
     }
 

@@ -25,26 +25,20 @@ public class ServerPushApplicationServlet extends ApplicationServlet {
     protected Application getNewApplication(final HttpServletRequest request) throws ServletException {
         final Application application = super.getNewApplication(request);
         if (application != null) {
-            application.addListener(new Application.WindowAttachListener() {
-                public void windowAttached(final Application.WindowAttachEvent event) {
-                    new Thread() {
-                        public void run() {
-                            while (event.getApplication().getMainWindow() == null) {
-                                try {
-                                    Thread.sleep(100);
-                                } catch (InterruptedException e) {
-                                    // ignore
-                                }
-                            }
-                            final Application application = event.getApplication();
-                            synchronized (application) {
-                                application.getMainWindow().addComponent(new ServerPush(request.getContextPath()));
-                            }
+            new Thread() {
+                public void run() {
+                    while (!application.isRunning()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            // ignore
                         }
-                    }.start();
-                    application.removeListener(this);
+                    }
+                    synchronized (application) {
+                        application.getMainWindow().addComponent(new ServerPush(request.getContextPath()));
+                    }
                 }
-            });
+            }.start();
         }
         return application;
     }
