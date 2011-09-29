@@ -22,10 +22,26 @@ import javax.servlet.http.HttpSession;
 public class ServerPushApplicationServlet extends ApplicationServlet {
 
     @Override
-    protected Application getNewApplication(HttpServletRequest request) throws ServletException {
+    protected Application getNewApplication(final HttpServletRequest request) throws ServletException {
         final Application application = super.getNewApplication(request);
-        if (application != null)
-            application.getMainWindow().addComponent(new ServerPush(request.getContextPath()));
+        if (application != null) {
+            application.addListener(new Application.WindowAttachListener() {
+                public void windowAttached(final Application.WindowAttachEvent event) {
+                    new Thread() {
+                        public void run() {
+                            while (event.getApplication().getMainWindow() == null) {
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e) {
+                                    // ignore
+                                }
+                            }
+                            event.getApplication().getMainWindow().addComponent(new ServerPush(request.getContextPath()));
+                        }
+                    }.start();
+                }
+            });
+        }
         return application;
     }
 
