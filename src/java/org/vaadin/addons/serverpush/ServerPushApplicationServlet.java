@@ -36,7 +36,10 @@ public class ServerPushApplicationServlet extends ApplicationServlet {
                                     // ignore
                                 }
                             }
-                            event.getApplication().getMainWindow().addComponent(new ServerPush(request.getContextPath()));
+                            final Application application = event.getApplication();
+                            synchronized (application) {
+                                application.getMainWindow().addComponent(new ServerPush(request.getContextPath()));
+                            }
                         }
                     }.start();
                 }
