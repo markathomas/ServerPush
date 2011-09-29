@@ -42,6 +42,7 @@ public class ServerPushApplicationServlet extends ApplicationServlet {
                             }
                         }
                     }.start();
+                    application.removeListener(this);
                 }
             });
         }
