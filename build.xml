@@ -103,7 +103,7 @@
                         <exclude name="*.zip"/>
                         <include name="${base.name}-${base.version}.jar"/>
                     </fileset>
-                    <fileset dir="${basedir}" includes="web/**/*, README.txt"/>
+                    <fileset dir="${basedir}" includes="web/**/*, README"/>
                 </jar>
             </sequential>
         </antcontrib:outofdate>

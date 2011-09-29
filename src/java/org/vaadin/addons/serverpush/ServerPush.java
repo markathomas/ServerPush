@@ -22,11 +22,22 @@ public class ServerPush extends AbstractComponent {
 
     public static final String COMET_NAME = "comet-1";
 
+    private final String contextPath;
+
+    public ServerPush() {
+        this("");
+    }
+
+    public ServerPush(String contextPath) {
+        this.contextPath = contextPath;
+    }
+
     @Override
     public void paintContent(PaintTarget target) throws PaintException {
         super.paintContent(target);
 
         target.addAttribute(VServerPush.COMET, COMET_NAME);
+        target.addAttribute(VServerPush.CONTEXT_PATH, this.contextPath);
     }
 
     public void push() {

@@ -29,6 +29,7 @@ import org.atmosphere.gwt.client.AtmosphereListener;
  */
 public class VServerPush extends Widget implements Paintable, AtmosphereListener {
 
+    public static final String CONTEXT_PATH = "contextPath";
     public static final String COMET = "comet";
     public static final String CLASSNAME = "v-" + COMET;
 
@@ -39,6 +40,7 @@ public class VServerPush extends Widget implements Paintable, AtmosphereListener
     protected ApplicationConnection client;
 
     private AtmosphereClient atmosphereClient;
+    private String contextPath;
 
     public VServerPush() {
         setElement(Document.get().createDivElement());
@@ -63,11 +65,18 @@ public class VServerPush extends Widget implements Paintable, AtmosphereListener
         // Save the client side identifier (paintable id) for the widget
         this.paintableId = uidl.getId();
 
+        if (this.contextPath == null) {
+            final String ctxPath = uidl.getStringAttribute(CONTEXT_PATH);
+            if (ctxPath == null)
+                this.contextPath = ctxPath;
+        }
+
         if (this.atmosphereClient == null) {
             Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
                 public void execute() {
                     if (getParent() != null) {
-                        atmosphereClient = new AtmosphereClient("/server-push", VServerPush.this);
+                        final String path = (contextPath == null ? "" : contextPath) + "/server-push";
+                        atmosphereClient = new AtmosphereClient(path, VServerPush.this);
                         atmosphereClient.start();
                     } else {
                         Scheduler.get().scheduleDeferred(this);

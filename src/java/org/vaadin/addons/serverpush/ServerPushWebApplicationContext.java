@@ -25,6 +25,7 @@ public class ServerPushWebApplicationContext extends WebApplicationContext {
     public CommunicationManager getApplicationManager(Application application, AbstractApplicationServlet servlet) {
         CommunicationManager mgr = (CommunicationManager)this.applicationToAjaxAppMgrMap.get(application);
 
+        servlet.getServletContext().getContextPath();
         if (mgr == null) {
             // Creates new manager
             mgr = new ServerPushCommunicationManager(application);

@@ -7,9 +7,12 @@
 
 package org.vaadin.addons.serverpush;
 
+import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.ApplicationServlet;
 import com.vaadin.terminal.gwt.server.WebApplicationContext;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -17,6 +20,14 @@ import javax.servlet.http.HttpSession;
  * which pushes updates to all client on every repaint request
  */
 public class ServerPushApplicationServlet extends ApplicationServlet {
+
+    @Override
+    protected Application getNewApplication(HttpServletRequest request) throws ServletException {
+        final Application application = super.getNewApplication(request);
+        if (application != null)
+            application.getMainWindow().addComponent(new ServerPush(request.getContextPath()));
+        return application;
+    }
 
     @Override
     protected WebApplicationContext getApplicationContext(HttpSession session) {
