@@ -8,7 +8,7 @@
   <style type="text/css">
     body {
       margin-top: 1.0em;
-      background-color: #c2872d;
+      background-color: #000000;
       font-family: Helvetica, Arial, FreeSans, san-serif;
       color: #ffffff;
     }
@@ -16,12 +16,11 @@
       margin: 0 auto;
       width: 700px;
     }
-    h1 { font-size: 3.8em; color: #3d78d2; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #3d78d2; }
-    h3 { text-align: center; color: #3d78d2; }
-    a { color: #3d78d2; }
+    h2 { font-size: 1.5em; }
+    h3 { text-align: center; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
     pre { background: #000; color: #fff; padding: 15px;}
@@ -65,14 +64,18 @@
     <h2>Dependencies</h2>
 <p>Atmosphere Framework 0.7.2+</p>
 <h2>Install</h2>
-<p>1) Add JARs in add-on archive to classpath (should also go in WEB-INF/lib)
-2) Create new widgetset if you do not already have a custom widgetset and inherit the org.vaadin.addons.serverpush.ServerPushWidgetset widgetset
-3) Compile new widgetset as part of your build and add to the VAADIN/widgetsets/ directory in the root of your web application
-4) Add the contents of the "web" directory from the add-on archive; merging if you need to. Your web.xml should have both AtmosphereServlet and the add-on's Vaadin servlet configured. atmosphere.xml should be in META-INF.
-5) Change servlet mapping for Vaadin servlet if you so desire, but leave the servlet mapping for AtmosphereServlet alone.
-6) Modify Vaadin servlet init-params to use your Application class and your custom widgetset
-7) Add the ServerPush widget to your Application if not using the ServerPushApplicationServlet
-8) Perform some action on the server that changes state on the client (e.g. add a new item to a table's container)</p>
+<p>
+<ol>
+    <li>Add JARs in add-on archive to classpath (should also go in WEB-INF/lib)</li>
+    <li>Create new widgetset if you do not already have a custom widgetset and inherit the org.vaadin.addons.serverpush.ServerPushWidgetset widgetset</li>
+    <li>Compile new widgetset as part of your build and add to the VAADIN/widgetsets/ directory in the root of your web application</li>
+    <li>Add the contents of the "web" directory from the add-on archive; merging if you need to. Your web.xml should have both AtmosphereServlet and the add-on's Vaadin servlet configured. atmosphere.xml should be in META-INF.</li>
+    <li>Change servlet mapping for Vaadin servlet if you so desire, but leave the servlet mapping for AtmosphereServlet alone.</li>
+    <li>Modify Vaadin servlet init-params to use your Application class and your custom widgetset</li>
+    <li>Add the ServerPush widget to your Application if not using the ServerPushApplicationServlet</li>
+    <li>Perform some action on the server that changes state on the client (e.g. add a new item to a table's container)</li>
+</ol>
+</p>
 <h2>License</h2>
 <p>Apache License, Version 2.0</p>
 <h2>Authors</h2>
