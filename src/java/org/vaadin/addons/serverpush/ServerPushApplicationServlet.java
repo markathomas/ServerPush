@@ -24,6 +24,7 @@ public class ServerPushApplicationServlet extends ApplicationServlet {
     @Override
     protected Application getNewApplication(final HttpServletRequest request) throws ServletException {
         final Application application = super.getNewApplication(request);
+        final String contextPath = request.getContextPath();
         if (application != null) {
             new Thread() {
                 public void run() {
@@ -35,7 +36,7 @@ public class ServerPushApplicationServlet extends ApplicationServlet {
                         }
                     }
                     synchronized (application) {
-                        application.getMainWindow().addComponent(new ServerPush(request.getContextPath()));
+                        application.getMainWindow().addComponent(new ServerPush(contextPath));
                     }
                 }
             }.start();
