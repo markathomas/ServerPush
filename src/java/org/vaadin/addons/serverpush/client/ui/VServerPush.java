@@ -67,7 +67,7 @@ public class VServerPush extends Widget implements Paintable, AtmosphereListener
 
         if (this.contextPath == null) {
             final String ctxPath = uidl.getStringAttribute(CONTEXT_PATH);
-            if (ctxPath == null)
+            if (ctxPath != null)
                 this.contextPath = ctxPath;
         }
 
