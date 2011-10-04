@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!--
-  ~ Copyright (C) 2011 Elihu, LLC. All rights reserved.
-  ~
-  ~ $Id$
-  -->
-
-<!-- $Id: build.xml 10397 2011-09-26 21:53:36Z archie $ -->
 <project name="serverpush"
   default="all"
   basedir="."

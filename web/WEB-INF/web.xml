@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (C) 2011 Elihu, LLC. All rights reserved.
-  ~
-  ~ $Id$
-  -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-   http://java.sun.com/xml/ns/javaee/web-app_3.0.xsd"
-   version="3.0">
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
     <servlet>
         <description>AtmosphereServlet</description>
@@ -47,17 +40,13 @@
             <param-name>productionMode</param-name>
             <param-value>false</param-value>
         </init-param>
-        <!--<init-param>
-            <param-name>codeBasePath</param-name>
-            <param-value>/gui</param-value>
-        </init-param>-->
         <init-param>
             <description>Application widgetset</description>
             <param-name>widgetset</param-name>
             <param-value>mywidgetset</param-value>
         </init-param>
+        <load-on-startup>2</load-on-startup>
         <async-supported>true</async-supported>
-        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
