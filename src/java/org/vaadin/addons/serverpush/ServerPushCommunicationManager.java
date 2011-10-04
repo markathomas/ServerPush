@@ -21,11 +21,6 @@ import com.vaadin.Application;
 import com.vaadin.terminal.Paintable;
 import com.vaadin.terminal.gwt.server.CommunicationManager;
 
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.cpr.BroadcasterFactory;
-import org.atmosphere.cpr.DefaultBroadcaster;
-import org.atmosphere.gwt.server.AtmosphereGwtHandler;
-
 public class ServerPushCommunicationManager extends CommunicationManager {
 
     public ServerPushCommunicationManager(Application application) {
@@ -35,9 +30,6 @@ public class ServerPushCommunicationManager extends CommunicationManager {
     @Override
     public void repaintRequested(Paintable.RepaintRequestEvent event) {
         super.repaintRequested(event);
-        final Broadcaster bc = BroadcasterFactory.getDefault().lookup(DefaultBroadcaster.class,
-          AtmosphereGwtHandler.GWT_BROADCASTER_ID);
-        if (bc != null)
-            bc.broadcast("[]");
+        ServerPushBroadcasterFactory.getInstance().broadcastForApplication(getApplication());
     }
 }

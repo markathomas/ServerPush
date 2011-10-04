@@ -22,10 +22,6 @@ import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.ClientWidget;
 
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.cpr.BroadcasterFactory;
-import org.atmosphere.cpr.DefaultBroadcaster;
-import org.atmosphere.gwt.server.AtmosphereGwtHandler;
 import org.vaadin.addons.serverpush.client.ui.VServerPush;
 
 @ClientWidget(VServerPush.class)
@@ -54,9 +50,6 @@ public class ServerPush extends AbstractComponent {
     }
 
     public void push() {
-        final Broadcaster bc = BroadcasterFactory.getDefault().lookup(DefaultBroadcaster.class,
-          AtmosphereGwtHandler.GWT_BROADCASTER_ID);
-        if (bc != null)
-            bc.broadcast("[]");
+        ServerPushBroadcasterFactory.getInstance().broadcastForApplication(getApplication());
     }
 }

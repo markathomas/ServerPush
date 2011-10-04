@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <atmosphere-handlers>
-    <atmosphere-handler context-root="/server-push" class-name="org.atmosphere.gwt.server.AtmosphereGwtHandler">
-         <property name="heartbeat" value="5000"/>
-     </atmosphere-handler>
+    <atmosphere-handler context-root="/server-push" class-name="org.vaadin.addons.serverpush.VaadinServerPushHandler">
+        <property name="heartbeat" value="5000"/>
+        <!--
+        Uncomment to use a separate push channel for each application
+        <property name="channelPerApplication" value="true"/>
+        -->
+    </atmosphere-handler>
 </atmosphere-handlers>
