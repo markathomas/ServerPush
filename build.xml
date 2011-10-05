@@ -7,4 +7,8 @@
         <ant antfile="build.xml" target="all" dir="modules/serverpush"/>
     </target>
 
+    <target name="samples" description="Builds samples">
+        <ant antfile="build.xml" target="all" dir="samples/chat-manual-singlechannel"/>
+    </target>
+
 </project>

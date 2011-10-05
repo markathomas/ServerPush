@@ -74,8 +74,7 @@
         <dellroad:compile-widgetset widgetset="org.vaadin.addons.serverpush.samples.chat.ChatWidgetset"/>
     </target>
 
-    <!--<target name="war" depends="mkdirs, widgets"-->
-    <target name="war"
+    <target name="war" depends="mkdirs, widgets"
       unless="war.completed" description="--> make WAR file">
         <antcontrib:outofdate>
             <sourcefiles>
