@@ -31,7 +31,7 @@ import com.vaadin.ui.Window;
 
 import org.vaadin.addons.serverpush.ServerPush;
 
-public abstract class ManualPushChatApplication extends Application implements Pushable, ChatMessageManager.ChatMessageListener {
+public abstract class ManualPushChatApplication extends Application implements Pushable, ManagerListener<Message> {
 
     private final ServerPush pusher;
     private final TabSheet tabSheet = new TabSheet();
@@ -106,7 +106,7 @@ public abstract class ManualPushChatApplication extends Application implements P
         this.comboBox.setContainerDataSource(new OnlineUsersContainer(user));
         OnlineUsersManager.getInstance().registerUser(user, this);
         this.header.setValue(this.header.getValue() + "<br/><p>Welcome " + username + "!</p><br/>");
-        ChatMessageManager.getInstance().addListener(this);
+        MessageManager.getInstance().addListener(this);
     }
 
     private void fireNewTab(User user, User from) {
@@ -129,9 +129,13 @@ public abstract class ManualPushChatApplication extends Application implements P
         }
     }
 
-    public void messageReceived(Message message) {
-        if (message.getTo().getUsername().equals(((User)getUser()).getUsername()))
+    public synchronized void objectAdded(Message message) {
+        if (message.getTo().getUsername().equals(((User)getUser()).getUsername())) {
             fireNewTab(message.getFrom(), (User)getUser());
+        }
+    }
+
+    public void objectRemoved(Message message) {
     }
 
     public void push() {

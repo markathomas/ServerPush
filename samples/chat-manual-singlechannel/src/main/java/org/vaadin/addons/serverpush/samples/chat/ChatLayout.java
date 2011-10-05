@@ -63,7 +63,7 @@ public class ChatLayout extends VerticalLayout {
                 msg.setFrom(from);
                 msg.setTo(user);
                 msg.setMessage(textArea.getValue().toString());
-                ChatMessageManager.getInstance().addMessage(msg);
+                MessageManager.getInstance().addMessage(msg);
                 textArea.setValue("");
             }
         });

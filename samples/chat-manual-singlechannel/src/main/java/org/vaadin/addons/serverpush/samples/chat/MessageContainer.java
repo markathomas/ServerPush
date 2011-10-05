@@ -19,10 +19,13 @@
 
 package org.vaadin.addons.serverpush.samples.chat;
 
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 
-public class MessageContainer extends BeanItemContainer<Message> implements ChatMessageManager.ChatMessageListener {
+public class MessageContainer extends BeanItemContainer<Message> implements ManagerListener<Message> {
+
+    private final OnlineUsersManager manager = OnlineUsersManager.getInstance();
 
     public MessageContainer(final User user, final User from) {
         super(Message.class);
@@ -37,13 +40,27 @@ public class MessageContainer extends BeanItemContainer<Message> implements Chat
                 return propertyId.equals("from") || propertyId.equals("to");
             }
         });
-        ChatMessageManager manager = ChatMessageManager.getInstance();
+        MessageManager manager = MessageManager.getInstance();
         manager.addListener(this);
-        for (Message m : manager.getMessages())
-            this.messageReceived(m);
+        for (Message m : manager.getObjects())
+            this.addBean(m);
     }
 
-    public void messageReceived(Message message) {
-        this.addBean(message);
+    public void objectAdded(Message message) {
+        Application app = this.manager.getApplication(message.getTo());
+        if (app != null) {
+            synchronized (app) {
+                this.addBean(message);
+            }
+        }
+    }
+
+    public void objectRemoved(Message message) {
+        Application app = this.manager.getApplication(message.getTo());
+        if (app != null) {
+            synchronized (app) {
+                this.removeItem(message);
+            }
+        }
     }
 }

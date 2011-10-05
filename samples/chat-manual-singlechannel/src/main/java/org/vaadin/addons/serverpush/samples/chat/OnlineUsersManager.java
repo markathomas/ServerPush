@@ -23,17 +23,14 @@ import com.vaadin.Application;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 
-public final class OnlineUsersManager {
+public final class OnlineUsersManager extends AbstractManager<User, ManagerListener<User>> {
 
     private static final OnlineUsersManager INSTANCE = new OnlineUsersManager();
 
     private final Map<User, Application> users = new WeakHashMap<User, Application>();
-    private final Set<OnlineUserListener> listeners = new HashSet<OnlineUserListener>();
 
     private OnlineUsersManager() {
         //
@@ -43,47 +40,25 @@ public final class OnlineUsersManager {
         return INSTANCE;
     }
 
-    public void addListener(OnlineUserListener listener) {
-        if (listener != null)
-            this.listeners.add(listener);
-    }
-
-    public boolean removeListener(OnlineUserListener listener) {
-        return this.listeners.remove(listener);
-    }
-
     public Collection<User> getOnlineUsers() {
         return Collections.unmodifiableSet(this.users.keySet());
+    }
+
+    public Application getApplication(User user) {
+        return this.users.get(user);
     }
 
     public void registerUser(User user, Application app) {
         if (!this.users.containsKey(user)) {
             this.users.put(user, app);
-            fireUserOnlineEvent(user);
+            fireObjectAdded(user);
         }
     }
 
     public void deregisterUser(User user) {
         if (this.users.containsKey(user)) {
             this.users.remove(user);
-            fireUserOfflineEvent(user);
+            fireObjectRemoved(user);
         }
-    }
-
-    private void fireUserOnlineEvent(User user) {
-        for (OnlineUserListener listener : this.listeners) {
-            listener.userOnline(user);
-        }
-    }
-
-    private void fireUserOfflineEvent(User user) {
-        for (OnlineUserListener listener : this.listeners) {
-            listener.userOffline(user);
-        }
-    }
-
-    public static interface OnlineUserListener {
-        void userOnline(User user);
-        void userOffline(User user);
     }
 }

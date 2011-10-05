@@ -19,11 +19,13 @@
 
 package org.vaadin.addons.serverpush.samples.chat;
 
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 
-public class OnlineUsersContainer extends BeanItemContainer<User> implements OnlineUsersManager.OnlineUserListener {
+public class OnlineUsersContainer extends BeanItemContainer<User> implements ManagerListener<User> {
 
+    private final OnlineUsersManager manager = OnlineUsersManager.getInstance();
 
     public OnlineUsersContainer(final User user) {
         super(User.class);
@@ -36,17 +38,27 @@ public class OnlineUsersContainer extends BeanItemContainer<User> implements Onl
                 return "username".equals(propertyId);
             }
         });
-        OnlineUsersManager manager = OnlineUsersManager.getInstance();
-        manager.addListener(this);
-        for (User u : manager.getOnlineUsers())
-            userOnline(u);
+
+        this.manager.addListener(this);
+        for (User u : this.manager.getOnlineUsers())
+            this.addBean(u);
     }
 
-    public void userOnline(User user) {
-        this.addBean(user);
+    public void objectAdded(User user) {
+        Application app = this.manager.getApplication(user);
+        if (app != null) {
+            synchronized (app) {
+                this.addBean(user);
+            }
+        }
     }
 
-    public void userOffline(User user) {
-        this.removeItem(user);
+    public void objectRemoved(User user) {
+        Application app = this.manager.getApplication(user);
+        if (app != null) {
+            synchronized (app) {
+                this.removeItem(user);
+            }
+        }
     }
 }

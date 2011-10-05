@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Licensed to the Apache Software Foundation (ASF) under one or more
+  ~  * contributor license agreements.  See the NOTICE file distributed with
+  ~  * this work for additional information regarding copyright ownership.
+  ~  * The ASF licenses this file to You under the Apache License, Version 2.0
+  ~  * (the "License"); you may not use this file except in compliance with
+  ~  * the License.  You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <servlet>
+        <description>AtmosphereServlet</description>
+        <servlet-name>AtmosphereServlet</servlet-name>
+        <servlet-class>org.atmosphere.cpr.AtmosphereServlet</servlet-class>
+        <init-param>
+            <!-- prevent deadlocks -->
+            <param-name>org.atmosphere.disableOnStateEvent</param-name>
+            <param-value>true</param-value>
+        </init-param>
+<!--        <init-param>
+            <param-name>org.atmosphere.useWebSocket</param-name>
+            <param-value>true</param-value>
+        </init-param>-->
+        <!--<init-param>
+            <param-name>org.atmosphere.useNative</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.useBlocking</param-name>
+            <param-value>true</param-value>
+        </init-param>-->
+        <load-on-startup>1</load-on-startup>
+        <!--Uncomment if you want to use Servlet 3.0 Async Support-->
+        <async-supported>true</async-supported>
+    </servlet>
+
+    <servlet>
+        <servlet-name>gui</servlet-name>
+        <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+        <init-param>
+            <param-name>application</param-name>
+            <param-value>org.vaadin.addons.serverpush.samples.chat.ManualPushSingleChannelChatApplication</param-value>
+        </init-param>
+        <init-param>
+            <param-name>productionMode</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <description>Application widgetset</description>
+            <param-name>widgetset</param-name>
+            <param-value>org.vaadin.addons.serverpush.samples.chat.ChatWidgetset</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+        <async-supported>true</async-supported>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AtmosphereServlet</servlet-name>
+        <url-pattern>/server-push</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>gui</servlet-name>
+        <url-pattern>/gui/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>
