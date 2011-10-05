@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ /*
+  ~  * Licensed to the Apache Software Foundation (ASF) under one or more
+  ~  * contributor license agreements.  See the NOTICE file distributed with
+  ~  * this work for additional information regarding copyright ownership.
+  ~  * The ASF licenses this file to You under the Apache License, Version 2.0
+  ~  * (the "License"); you may not use this file except in compliance with
+  ~  * the License.  You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<project name="chat-manual-singlechannel"
+  default="all"
+  basedir="."
+  xmlns:dellroad="urn:org.dellroad.ant"
+  xmlns:antcontrib="urn:net.sf.antcontrib">
+
+    <!-- Timestamp -->
+    <tstamp/>
+
+    <!-- Define some properties -->
+    <property name="base.name" value="${ant.project.name}"/>
+    <property name="base.version" value="1.0.5"/>
+
+    <!-- Import build macros -->
+    <import file="../../buildsettings/macros.xml"/>
+
+    <!-- Additional "clean" steps -->
+    <target name="clean-project">
+        <delete dir="build"/>
+        <delete dir="dist"/>
+    </target>
+
+    <!-- PATH definitions -->
+    <target name="javac.classpath" depends="compile-serverpush" unless="javac.classpath.resolved">
+        <dellroad:ivypath pathid="a.classpath" conf="build"/>
+        <dellroad:ivyreport conf="build"/>
+        <path id="javac.classpath">
+            <path refid="a.classpath"/>
+            <pathelement location="../../modules/serverpush/build/classes"/>
+            <pathelement location="../../modules/serverpush/src/main/java"/>
+            <pathelement location="../../modules/serverpush/src/main/resources"/>
+        </path>
+        <property name="javac.classpath.resolved" value="true"/>
+    </target>
+
+    <target name="mkdirs" description="--> creates build structure" unless="mkdirs.completed">
+        <mkdir dir="build/classes"/>
+        <mkdir dir="build/dist"/>
+        <property name="mkdirs.completed" value="true"/>
+    </target>
+
+    <target name="all" depends="dist"
+      description="--> cleans project, checks for style violations, builds war file, generates all reports"/>
+
+    <target name="dist" depends="clean, mkdirs, war"
+      description="--> cleans project and builds WAR file"/>
+
+    <target name="compile-serverpush">
+        <ant dir="../../modules/serverpush" antfile="build.xml" target="javac" inheritall="false" inheritrefs="false"/>
+    </target>
+
+    <!-- Build GWT widget set -->
+    <target name="widgets" depends="javac">
+        <dellroad:compile-widgetset widgetset="org.vaadin.addons.serverpush.samples.chat.ChatWidgetset"/>
+    </target>
+
+    <!--<target name="war" depends="mkdirs, widgets"-->
+    <target name="war"
+      unless="war.completed" description="--> make WAR file">
+        <antcontrib:outofdate>
+            <sourcefiles>
+                <fileset dir="." includes="build.xml"/>
+                <fileset dir="../../" includes="ivy.xml"/>
+                <fileset dir="build/classes" includes="**/*"/>
+            </sourcefiles>
+            <targetfiles path="build/dist/${base.name}.war"/>
+            <sequential>
+
+                <mkdir dir="build/libs"/>
+                <dellroad:ivyput transitive="false" pattern="build/libs/[artifact]-[revision].[ext]" conf="atmosphere"/>
+                <dellroad:ivyput transitive="false" pattern="build/libs/[artifact]-[revision].[ext]" conf="samples"/>
+
+                <dellroad:ivyput pattern="build/[module].[ext]" conf="vaadin"/>
+
+                <!-- Build WAR -->
+                <war warfile="build/dist/${base.name}.war" basedir="src/main/webapp" includes="index.jsp" webxml="src/main/webapp/WEB-INF/web.xml">
+                    <classes dir="build/classes"/>
+                    <classes dir="../../modules/serverpush/build/classes"/>
+                    <webinf dir="build/widget/VAADIN/widgetsets/WEB-INF"/>
+                    <lib dir="build/libs"/>
+                    <fileset dir="build/widget" includes="VAADIN/widgetsets/**/*" excludes="VAADIN/widgetsets/WEB-INF"/>
+                    <zipfileset src="build/vaadin.jar" includes="VAADIN/**/*"/>
+                    <manifest>
+                        <attribute name="Build-User" value="${user.name}"/>
+                        <attribute name="Build-Time" value="${TODAY} ${TSTAMP}"/>
+                    </manifest>
+                    <metainf dir="src/main/webapp/META-INF"/>
+                    <fileset dir="../../" includes="README"/>
+                </war>
+            </sequential>
+        </antcontrib:outofdate>
+        <property name="war.completed" value="true"/>
+    </target>
+
+</project>

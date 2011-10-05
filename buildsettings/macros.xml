@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="build-macros"
+  xmlns:antcontrib="urn:net.sf.antcontrib"
+  xmlns:dellroad="urn:org.dellroad.ant"
+  xmlns:ivy="urn:org.apache.ivy.ant">
+
+<!--
+    Instructions for includers of this file:
+
+    - Define "javac.classpath" target finding classes required for javac and unit test compilation
+    - Override "javac.compiler.flags" if desired
+
+-->
+
+    <!-- Project should override this as necessary -->
+    <property name="javac.compiler.flags" value=""/>
+
+<!--
+        ************* DETERMINE BASE DIRECTORY ****************
+-->
+
+    <dirname property="build.macros.dir" file="${ant.file.build-macros}"/>
+    <property name="build.macros.ivy.file" value="${build.macros.dir}/../ivy.xml"/>
+
+<!--
+        ************* DEFINE ANTCONTRIB AND IVY STUFF ****************
+-->
+
+    <!-- Set variables -->
+    <property name="data.dir" value="/usr/share"/>
+
+    <!-- Load environment variables as properties with "environ." prefix -->
+    <property environment="environ"/>
+
+    <!-- Find ivy.jar; use IVY_JAR environment variable if set, otherwise fall back to default -->
+    <condition property="ivy.jar" value="${environ.IVY_JAR}">
+        <isset property="environ.IVY_JAR"/>
+    </condition>
+    <condition property="ivy.jar" value="${data.dir}/java/ivy.jar">
+        <not>
+            <isset property="environ.IVY_JAR"/>
+        </not>
+    </condition>
+    <fail message="can't find ivy.jar; please install ${data.dir}/java/ivy.jar or set $IVY_JAR">
+        <condition>
+            <not>
+                <available file="${ivy.jar}"/>
+            </not>
+        </condition>
+    </fail>
+
+    <!-- Import ivy tasks -->
+    <taskdef uri="urn:org.apache.ivy.ant" resource="org/apache/ivy/ant/antlib.xml" classpath="${ivy.jar}"/>
+
+    <!-- Find ant-contrib.jar; use ANT_CONTRIB_JAR environment variable if set, otherwise fall back to default -->
+    <condition property="ant-contrib.jar" value="${env.ANT_CONTRIB_JAR}">
+        <isset property="environ.ANT_CONTRIB_JAR"/>
+    </condition>
+    <condition property="ant-contrib.jar" value="${data.dir}/java/ant-contrib.jar">
+        <not>
+            <isset property="environ.ANT_CONTRIB_JAR"/>
+        </not>
+    </condition>
+    <fail message="can't find ant-contrib.jar; please install ${data.dir}/java/ant-contrib.jar or set $ANT_CONTRIB_JAR">
+        <condition>
+            <not>
+                <available file="${ant-contrib.jar}"/>
+            </not>
+        </condition>
+    </fail>
+
+    <!-- Import ant-contrib tasks -->
+    <taskdef uri="urn:net.sf.antcontrib" resource="net/sf/antcontrib/antcontrib.properties" classpath="${ant-contrib.jar}"/>
+
+<!--
+        ************* IVY CONFIGURATION ****************
+-->
+
+    <!--
+        Macro for resolving a classpath by naming the module, etc. directly.
+        Defines classpath "@{pathid}" and sets property "@{pathid}.resolved".
+    -->
+    <macrodef uri="urn:org.dellroad.ant" name="ivymodpath">
+        <attribute name="pathid" description="Classpath reference id to define"/>
+        <attribute name="org" description="Module organisation name"/>
+        <attribute name="mod" description="Module module name"/>
+        <attribute name="rev" description="Module revision"/>
+        <attribute name="conf" default="default" description="Name of the ivy configuration to resolve"/>
+        <attribute name="type" default="jar" description="Type of artifact to resolve"/>
+        <attribute name="settingsRef" default="build-macros-ivy-settings" description="Reference to ivy settings"/>
+        <attribute name="transitive" default="true" description="Whether to resolve dependencies transitively"/>
+        <attribute name="log" default="download-only" description="When to log activity"/>
+        <sequential>
+            <ivy:resolve settingsRef="@{settingsRef}" organisation="@{org}" module="@{mod}" revision="@{rev}"
+              type="@{type}" inline="true" transitive="@{transitive}" conf="@{conf}" log="@{log}"/>
+            <ivy:cachepath settingsRef="@{settingsRef}" organisation="@{org}" module="@{mod}" revision="@{rev}"
+              type="@{type}" inline="true" transitive="@{transitive}" conf="@{conf}" log="@{log}" pathid="@{pathid}"/>
+            <property name="@{pathid}.resolved" value="true"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+        Macro for resolving a classpath using a named configuration in ivy.xml.
+        Defines classpath "@{pathid}" and sets property "@{pathid}.resolved".
+    -->
+    <macrodef uri="urn:org.dellroad.ant" name="ivypath">
+        <attribute name="pathid" description="Classpath reference id to define"/>
+        <attribute name="ivyfile" default="${build.macros.ivy.file}" description="ivy.xml defining the named configuration"/>
+        <attribute name="conf" description="Name of the ivy configuration to resolve"/>
+        <attribute name="type" default="jar" description="Type of artifact to resolve"/>
+        <attribute name="settingsRef" default="build-macros-ivy-settings" description="Reference to ivy settings"/>
+        <attribute name="transitive" default="true" description="Whether to resolve dependencies transitively"/>
+        <attribute name="log" default="download-only" description="When to log activity"/>
+        <sequential>
+            <ivy:resolve file="@{ivyfile}" settingsRef="@{settingsRef}" type="@{type}"
+              transitive="@{transitive}" conf="@{conf}" log="@{log}"/>
+            <ivy:cachepath file="@{ivyfile}" settingsRef="@{settingsRef}" type="@{type}"
+              transitive="@{transitive}" conf="@{conf}" log="@{log}" pathid="@{pathid}"/>
+            <property name="@{pathid}.resolved" value="true"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+        Macro for resolving a fileset using a named configuration in ivy.xml.
+        Defines fileset "@{setid}" and sets property "@{setid}.resolved".
+    -->
+    <macrodef uri="urn:org.dellroad.ant" name="ivyfileset">
+        <attribute name="setid" description="Fileset reference id to define"/>
+        <attribute name="ivyfile" default="${build.macros.ivy.file}" description="ivy.xml defining the named configuration"/>
+        <attribute name="conf" description="Name of the ivy configuration to resolve"/>
+        <attribute name="type" default="jar" description="Type of artifact to resolve"/>
+        <attribute name="settingsRef" default="build-macros-ivy-settings" description="Reference to ivy settings"/>
+        <attribute name="transitive" default="true" description="Whether to resolve dependencies transitively"/>
+        <attribute name="log" default="download-only" description="When to log activity"/>
+        <sequential>
+            <ivy:resolve file="@{ivyfile}" settingsRef="@{settingsRef}" type="@{type}"
+              transitive="@{transitive}" conf="@{conf}" log="@{log}"/>
+            <ivy:cachefileset file="@{ivyfile}" settingsRef="@{settingsRef}" type="@{type}"
+              transitive="@{transitive}" conf="@{conf}" log="@{log}" setid="@{setid}"/>
+            <property name="@{setid}.resolved" value="true"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+        Macro for retrieving ivy artifacts using a named configuration in ivy.xml.
+    -->
+    <macrodef uri="urn:org.dellroad.ant" name="ivyput">
+        <attribute name="pattern" description="Ivy pattern for artifact destination"/>
+        <attribute name="ivyfile" default="${build.macros.ivy.file}" description="ivy.xml defining the named configuration"/>
+        <attribute name="conf" description="Name of the ivy configuration to resolve"/>
+        <attribute name="type" default="jar" description="Type of artifact to resolve"/>
+        <attribute name="settingsRef" default="build-macros-ivy-settings" description="Reference to ivy settings"/>
+        <attribute name="transitive" default="true" description="Whether to resolve dependencies transitively"/>
+        <attribute name="log" default="download-only" description="When to log activity"/>
+        <sequential>
+            <ivy:resolve file="@{ivyfile}" settingsRef="@{settingsRef}" type="@{type}"
+              transitive="@{transitive}" conf="@{conf}" log="@{log}"/>
+            <ivy:retrieve file="@{ivyfile}" settingsRef="@{settingsRef}" type="@{type}"
+              transitive="@{transitive}" conf="@{conf}" log="@{log}" pattern="@{pattern}"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+        Macro for retrieving artifacts by naming the module, etc. directly.
+        Does not require an ivy.xml file.
+    -->
+    <macrodef uri="urn:org.dellroad.ant" name="ivymodget">
+        <attribute name="pattern" description="Ivy pattern for artifact destination"/>
+        <attribute name="org" description="Module organisation name"/>
+        <attribute name="mod" description="Module module name"/>
+        <attribute name="rev" description="Module revision"/>
+        <attribute name="conf" default="default" description="Name of the ivy configuration to resolve"/>
+        <attribute name="type" default="jar" description="Type of artifact to resolve"/>
+        <attribute name="settingsRef" default="build-macros-ivy-settings" description="Reference to ivy settings"/>
+        <attribute name="transitive" default="true" description="Whether to resolve dependencies transitively"/>
+        <attribute name="log" default="download-only" description="When to log activity"/>
+        <sequential>
+            <ivy:resolve settingsRef="@{settingsRef}" organisation="@{org}" module="@{mod}" revision="@{rev}"
+              type="@{type}" inline="true" transitive="@{transitive}" conf="@{conf}" log="@{log}"/>
+            <ivy:retrieve settingsRef="@{settingsRef}" organisation="@{org}" module="@{mod}" revision="@{rev}"
+              type="@{type}" inline="true" transitive="@{transitive}" conf="@{conf}" log="@{log}" pattern="@{pattern}"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+        Macro for generating a resolution report for a given configuration.
+        Requires a previous <ivy:resolve> operation.
+    -->
+    <macrodef uri="urn:org.dellroad.ant" name="ivyreport">
+        <attribute name="conf" default="default" description="Name of the ivy configuration to report"/>
+        <attribute name="destdir" default="build/reports/ivy" description="Directory in which to put generated reports"/>
+        <attribute name="settingsRef" default="build-macros-ivy-settings" description="Reference to ivy settings"/>
+        <sequential>
+            <mkdir dir="@{destdir}"/>
+            <ivy:report settingsRef="@{settingsRef}" conf="@{conf}" todir="@{destdir}" xml="true" outputpattern="[conf].[ext]"/>
+        </sequential>
+    </macrodef>
+
+    <!-- Configure Ivy -->
+    <antcontrib:if>
+        <available file="${basedir}/settings.xml" type="file"/>
+        <antcontrib:then>
+            <ivy:settings id="build-macros-ivy-settings" file="${basedir}/settings.xml"/>
+        </antcontrib:then>
+        <antcontrib:elseif>
+            <available file="${data.dir}/ivy/settings.xml" type="file"/>
+            <antcontrib:then>
+                <ivy:settings id="build-macros-ivy-settings" file="${data.dir}/ivy/settings.xml"/>
+            </antcontrib:then>
+        </antcontrib:elseif>
+        <antcontrib:else>
+            <ivy:settings id="build-macros-ivy-settings" file="${build.macros.dir}/ivysettings.xml"/>
+        </antcontrib:else>
+    </antcontrib:if>
+
+<!--
+        ************* MACROS AND PRESETDEFS ****************
+-->
+    <presetdef uri="urn:org.dellroad.ant" name="javac-default">
+        <javac includeantruntime="no"
+               compiler="modern"
+               deprecation="true"
+               source="1.6"
+               target="1.6"
+               debug="true">
+            <compilerarg line="${javac.compiler.flags}"/>
+        </javac>
+    </presetdef>
+
+    <!--
+        Javadoc macro
+
+        Requires:
+            path "javac.classpath"
+        Optional:
+            property "javac.compiler.flags"
+    -->
+    <macrodef uri="urn:org.dellroad.ant" name="javadoc">
+        <attribute name="title" default="Java Class Library API"/>
+        <element name="links" optional="yes"/>
+        <element name="excludes" optional="yes"/>
+        <element name="addclasspath" optional="yes"/>
+        <sequential>
+            <antcontrib:outofdate>
+                <sourcefiles>
+                    <fileset dir="${basedir}/src/main/java">
+                        <include name="**/*.java"/>
+                        <excludes/>
+                    </fileset>
+                </sourcefiles>
+                <targetfiles path="build/reports/javadoc/index.html"/>
+                <sequential>
+                    <delete dir="build/reports/javadoc"/>
+                    <mkdir dir="build/reports/javadoc"/>
+                    <javadoc destdir="build/reports/javadoc" use="true"
+                      source="1.5" breakiterator="yes" linksource="true"
+                      windowtitle="@{title}" doctitle="@{title}" failonerror="true">
+                        <classpath>
+                            <addclasspath/>
+                            <path refid="javac.classpath"/>
+                        </classpath>
+                        <packageset dir="${basedir}/src/main/java" defaultexcludes="yes">
+                            <include name="**/*"/>
+                            <excludes/>
+                        </packageset>
+                        <links/>
+                    </javadoc>
+                </sequential>
+            </antcontrib:outofdate>
+        </sequential>
+    </macrodef>
+
+    <macrodef uri="urn:org.dellroad.ant" name="compile-widgetset">
+        <attribute name="widgetset"/>
+        <sequential>
+            <antcontrib:outofdate>
+                <sourcefiles>
+                    <fileset dir="${basedir}/src/main/java">
+                        <include name="**/*.java"/>
+                    </fileset>
+                    <fileset dir="${basedir}/src/main/resources"/>
+                </sourcefiles>
+                <targetfiles path="build/widget/VAADIN/widgetsets/@{widgetset}"/>
+                <sequential>
+                    <delete dir="build/widget"/>
+                    <mkdir dir="build/widget/VAADIN/widgetsets"/>
+                    <java classname="com.google.gwt.dev.Compiler" failonerror="yes" fork="yes" maxmemory="256m">
+                        <arg value="-logLevel" />
+                        <arg value="INFO" />
+                        <arg value="-style" />
+                        <arg value="PRETTY" />
+                        <arg value="-war" />
+                        <arg value="build/widget/VAADIN/widgetsets" />
+                        <arg value="@{widgetset}" />
+                        <jvmarg value="-Xss1024k"/>
+                        <jvmarg value="-Djava.awt.headless=true"/>
+                        <classpath>
+                            <path refid="javac.classpath"/>
+                            <pathelement location="${basedir}/src/main/java"/>
+                            <pathelement location="${basedir}/src/main/resources"/>
+                            <pathelement location="build/classes"/>
+                        </classpath>
+                    </java>
+                </sequential>
+            </antcontrib:outofdate>
+        </sequential>
+    </macrodef>
+<!--
+        ************* PREDEFINED TARGETS ****************
+-->
+
+    <target name="clean" depends="clean-project">
+        <delete dir="build"/>
+        <delete dir="dist"/>
+    </target>
+    <target name="clean-project"/>
+
+    <target name="javac" depends="javac-project, javac.classpath" unless="javac.completed">
+
+        <!-- Main classes -->
+        <antcontrib:if>
+            <available file="${basedir}/src/main/java" type="dir"/>
+            <antcontrib:then>
+                <mkdir dir="build/classes"/>
+                <antcontrib:outofdate>
+                    <sourcefiles>
+                        <fileset dir="${basedir}/src/main/java">
+                            <include name="**/*.java"/>
+                            <exclude name="**/package-info.java"/>
+                        </fileset>
+                    </sourcefiles>
+                    <mapper type="glob" dir="${basedir}/src/main/java" from="*.java" to="build/classes/*.class"/>
+                    <sequential>
+                        <mkdir dir="build/classes"/>
+                        <dellroad:javac-default srcdir="${basedir}/src/main/java" destdir="build/classes">
+                            <classpath refid="javac.classpath"/>
+                        </dellroad:javac-default>
+                    </sequential>
+                </antcontrib:outofdate>
+            </antcontrib:then>
+        </antcontrib:if>
+
+        <property name="javac.completed" value="true"/>
+    </target>
+    <target name="javac-project"/>
+
+    <target name="diag">
+        <diagnostics/>
+    </target>
+
+    <!-- Application should override -->
+    <target name="javac.classpath"/>
+
+</project>

@@ -19,13 +19,16 @@
     <configurations defaultconfmapping="*-&gt;default">
         <conf name="build" description="Required to build our project"/>
         <conf name="atmosphere" description="Atmosphere libs"/>
+        <conf name="vaadin" description="Vaadin JAR"/>
+        <conf name="samples" description="JARs for samples"/>
     </configurations>
 
     <dependencies>
-        <dependency force="true" org="com.vaadin" name="vaadin" rev="6.7.0" conf="build->default"/>
-        <dependency force="true" org="com.google" name="gwt" rev="2.4.0" conf="build->runtime"/>
+        <dependency force="true" org="com.vaadin" name="vaadin" rev="6.7.0" conf="build,vaadin,samples->default"/>
+        <dependency force="true" org="com.google" name="gwt" rev="2.4.0" conf="build,samples->runtime"/>
         <dependency force="true" org="javax.servlet" name="servletapi" rev="3.0" conf="build->default"/>
-        <dependency force="true" org="org.slf4j" name="slf4j" rev="1.6.1" conf="build->log4j"/>
+        <dependency force="true" org="org.slf4j" name="slf4j" rev="1.6.1" conf="build,atmosphere->core;samples->log4j"/>
+        <dependency force="true" org="org.apache.log4j" name="log4j" rev="1.2.16" conf="samples->default"/>
         <dependency force="true" org="org.atmosphere" name="atmosphere" rev="0.7.2" conf="build,atmosphere->gwt">
             <exclude name="atmosphere-ping.*"/>
         </dependency>

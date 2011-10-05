@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ /*
+  ~  * Licensed to the Apache Software Foundation (ASF) under one or more
+  ~  * contributor license agreements.  See the NOTICE file distributed with
+  ~  * this work for additional information regarding copyright ownership.
+  ~  * The ASF licenses this file to You under the Apache License, Version 2.0
+  ~  * (the "License"); you may not use this file except in compliance with
+  ~  * the License.  You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<project name="serverpush"
+  default="all"
+  basedir="."
+  xmlns:dellroad="urn:org.dellroad.ant"
+  xmlns:antcontrib="urn:net.sf.antcontrib">
+
+    <!-- Timestamp -->
+    <tstamp/>
+
+    <!-- Define some properties -->
+    <property name="base.name" value="${ant.project.name}"/>
+    <property name="base.version" value="1.0.5"/>
+
+    <!-- Import build macros -->
+    <import file="../../buildsettings/macros.xml"/>
+
+    <!-- Additional "clean" steps -->
+    <target name="clean-project">
+        <delete dir="build"/>
+        <delete dir="dist"/>
+    </target>
+
+    <!-- PATH definitions -->
+    <target name="javac.classpath" unless="javac.classpath.resolved">
+        <dellroad:ivypath pathid="javac.classpath" conf="build"/>
+        <dellroad:ivyreport conf="build"/>
+        <property name="javac.classpath.resolved" value="true"/>
+    </target>
+
+    <target name="mkdirs" description="--> creates build structure" unless="mkdirs.completed">
+        <mkdir dir="build/classes"/>
+        <mkdir dir="build/dist"/>
+        <property name="mkdirs.completed" value="true"/>
+    </target>
+
+    <target name="javadoc" depends="javac.classpath" description="--> generates javadocs">
+        <dellroad:javadoc>
+            <links>
+                <link href="http://download.oracle.com/javase/6/docs/api/"/>
+                <link href="http://download.oracle.com/javaee/6/api/"/>
+                <link href="http://google-web-toolkit.googlecode.com/svn/javadoc/latest/"/>
+            </links>
+        </dellroad:javadoc>
+    </target>
+
+    <target name="all" depends="dist"
+      description="--> cleans project, checks for style violations, builds war file, generates all reports"/>
+
+    <target name="dist" depends="clean, mkdirs, vaadin-dist"
+      description="--> cleans project and builds WAR file"/>
+
+    <target name="vaadin-dist" depends="mkdirs, javac"
+      unless="vaadin-dist.completed" description="--> make Vaadin add-on archive">
+        <antcontrib:outofdate>
+            <sourcefiles>
+                <fileset dir="." includes="build.xml"/>
+                <fileset dir="../../" includes="ivy.xml"/>
+                <fileset dir="build/classes" includes="**/*"/>
+            </sourcefiles>
+            <targetfiles path="build/dist/${base.name}-${base.version}.zip"/>
+            <sequential>
+
+                <mkdir dir="build/libs"/>
+                <dellroad:ivyput transitive="false" pattern="build/libs/[artifact]-[revision].[ext]" conf="atmosphere"/>
+
+                <jar destfile="build/dist/${base.name}-${base.version}.jar" basedir="build/classes">
+                    <manifest>
+                        <attribute name="Build-User" value="${user.name}"/>
+                        <attribute name="Build-Time" value="${TODAY} ${TSTAMP}"/>
+                        <attribute name="Vaadin-Package-Version" value="1"/>
+                        <attribute name="Implementation-Title" value="ServerPush"/>
+                        <attribute name="Implementation-Version" value="${base.version}"/>
+                        <attribute name="Vaadin-Widgetsets" value="org.vaadin.addons.serverpush.ServerPushWidgetset"/>
+                        <attribute name="Vaadin-Addon" value="serverpush-${base.version}.jar"/>
+                    </manifest>
+                    <fileset dir="src/main/java" includes="**/*"/>
+                </jar>
+
+                <!-- Build zip file -->
+                <jar destfile="build/dist/${base.name}-${base.version}.zip" basedir="build/libs">
+                    <manifest>
+                        <attribute name="Build-User" value="${user.name}"/>
+                        <attribute name="Build-Time" value="${TODAY} ${TSTAMP}"/>
+                        <attribute name="Vaadin-Package-Version" value="1"/>
+                        <attribute name="Implementation-Title" value="ServerPush"/>
+                        <attribute name="Implementation-Version" value="${base.version}"/>
+                        <attribute name="Vaadin-Widgetsets" value="org.vaadin.addons.serverpush.ServerPushWidgetset"/>
+                        <attribute name="Vaadin-Addon" value="serverpush-${base.version}.jar"/>
+                    </manifest>
+                    <fileset dir="build/dist">
+                        <exclude name="*.zip"/>
+                        <include name="${base.name}-${base.version}.jar"/>
+                    </fileset>
+                    <fileset dir="src/main/webapp"/>
+                    <fileset dir="../../" includes="README"/>
+                </jar>
+            </sequential>
+        </antcontrib:outofdate>
+        <property name="vaadin-dist.completed" value="true"/>
+    </target>
+
+</project>
