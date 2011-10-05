@@ -9,6 +9,7 @@
 
     <target name="samples" description="Builds samples">
         <ant antfile="build.xml" target="all" dir="samples/chat-manual-singlechannel"/>
+        <ant antfile="build.xml" target="all" dir="samples/sales-auto-multichannel"/>
     </target>
 
 </project>
