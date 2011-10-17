@@ -21,7 +21,12 @@ import com.vaadin.Application;
 import com.vaadin.terminal.Paintable;
 import com.vaadin.terminal.gwt.server.CommunicationManager;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 public class ServerPushCommunicationManager extends CommunicationManager {
+
+    private final transient Map<Application, Thread> applicationThreadMap = new WeakHashMap<Application, Thread>();
 
     public ServerPushCommunicationManager(Application application) {
         super(application);
@@ -30,6 +35,27 @@ public class ServerPushCommunicationManager extends CommunicationManager {
     @Override
     public void repaintRequested(Paintable.RepaintRequestEvent event) {
         super.repaintRequested(event);
-        ServerPushBroadcasterFactory.getInstance().broadcastForApplication(getApplication());
+        final Application app = getApplication();
+        synchronized (this.applicationThreadMap) {
+            if (!this.applicationThreadMap.containsKey(app)) {
+                Thread updateThread = createUpdateThread(app);
+                this.applicationThreadMap.put(app, updateThread);
+                updateThread.start();
+            }
+        }
+    }
+
+    private Thread createUpdateThread(final Application app) {
+        return new Thread() {
+            public void run() {
+                try {
+                    synchronized (app) {
+                        ServerPushBroadcasterFactory.getInstance().broadcastForApplication(app);
+                    }
+                } finally {
+                    applicationThreadMap.remove(app);
+                }
+            }
+        };
     }
 }
