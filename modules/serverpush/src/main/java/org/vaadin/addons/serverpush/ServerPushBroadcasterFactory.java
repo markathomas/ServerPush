@@ -26,6 +26,12 @@ import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.cpr.DefaultBroadcaster;
 import org.atmosphere.gwt.server.AtmosphereGwtHandler;
 
+/**
+ * Factory class for obtaining {@link Broadcaster}s and for broadcasting updates
+ * @author Mark Thomas
+ * @version 1.0.5
+ * @since 1.0.5
+ */
 public final class ServerPushBroadcasterFactory {
 
     private static final ServerPushBroadcasterFactory INSTANCE = new ServerPushBroadcasterFactory();
@@ -35,18 +41,38 @@ public final class ServerPushBroadcasterFactory {
     private ServerPushBroadcasterFactory() {
     }
 
+    /**
+     * Returns singleton instance of factory
+     * @return singleton instance of factory
+     */
     public static ServerPushBroadcasterFactory getInstance() {
         return INSTANCE;
     }
 
+    /**
+     * Retrieves existing {@link Broadcaster} for the specified session id if it exists; otherwise, creates a new instance.  Behavior is further
+     * modified by whether or not the factory is configured to return a unique {@link Broadcaster} per session or a global {@link Broadcaster}
+     * @param sessionID HttpSession id
+     * @return {@link Broadcaster} instance per session or global
+     */
     public Broadcaster getBroadcaster(String sessionID) {
         String uid = AtmosphereGwtHandler.GWT_BROADCASTER_ID + (this.channelPerApplication ? "-" + sessionID : "");
         return BroadcasterFactory.getDefault().lookup(DefaultBroadcaster.class, uid, true);
     }
 
+    /**
+     * Broadcasts empty array as JSON to trigger client update
+     * @param application {@link Application} instance
+     */
     public void broadcastForApplication(Application application) {
         this.broadcastForApplication(application, "[]");
     }
+
+    /**
+     * Broadcasts specified JSON data to trigger client update
+     * @param application {@link Application} instance
+     * @param json JSON-encoded String
+     */
     public void broadcastForApplication(Application application, String json) {
         final String sessionID = ((WebApplicationContext)application.getContext()).getHttpSession().getId();
         final Broadcaster bc = this.getBroadcaster(sessionID);
@@ -54,6 +80,10 @@ public final class ServerPushBroadcasterFactory {
             bc.broadcast(json);
     }
 
+    /**
+     * Sets the factory to retrieve {@link Broadcaster} instances on a global or per session level
+     * @param channelPerApplication
+     */
     public void setChannelPerApplication(boolean channelPerApplication) {
         this.channelPerApplication = channelPerApplication;
     }

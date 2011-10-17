@@ -24,6 +24,16 @@ import com.vaadin.terminal.gwt.server.WebApplicationContext;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * Web application context for Vaadin applications.
+ *
+ * This is automatically added as a {@link javax.servlet.http.HttpSessionBindingListener} when
+ * added to a {@link HttpSession}.
+ *
+ * @author Mark Thomas
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 public class ServerPushWebApplicationContext extends WebApplicationContext {
 
     public ServerPushWebApplicationContext(HttpSession session) {

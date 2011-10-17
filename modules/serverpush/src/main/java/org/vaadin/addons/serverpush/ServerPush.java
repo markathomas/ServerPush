@@ -24,6 +24,9 @@ import com.vaadin.ui.ClientWidget;
 
 import org.vaadin.addons.serverpush.client.ui.VServerPush;
 
+/**
+ * Server push server-side widget
+ */
 @ClientWidget(VServerPush.class)
 public class ServerPush extends AbstractComponent {
 
@@ -31,10 +34,22 @@ public class ServerPush extends AbstractComponent {
 
     private final String contextPath;
 
+    /**
+     * Constructor that uses the root context path and expects the server-push URL to be '/server-push'
+     */
     public ServerPush() {
         this("");
     }
 
+    /**
+     * Constructor that uses the specified context path
+     * @param contextPath path to the server-push URL as defined in WEB-INF/web.xml and META-INF/atmosphere.xml minus '/server-push'
+     * Examples:
+     *   - If path is '/foo/server-push' then comtext path is '/foo'
+     *   - If path is '/foo/bar/baz/server-push' then context path is '/foo/bar/baz'
+     *   - If path is '/server-push' then context path is ''
+     *
+     */
     public ServerPush(String contextPath) {
         if (contextPath == null)
             contextPath = "";
@@ -49,6 +64,9 @@ public class ServerPush extends AbstractComponent {
         target.addAttribute(VServerPush.CONTEXT_PATH, this.contextPath);
     }
 
+    /**
+     * Pushes updates to client
+     */
     public void push() {
         ServerPushBroadcasterFactory.getInstance().broadcastForApplication(getApplication());
     }

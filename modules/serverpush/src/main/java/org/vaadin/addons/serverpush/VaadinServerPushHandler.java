@@ -28,6 +28,10 @@ import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.gwt.server.AtmosphereGwtHandler;
 import org.atmosphere.gwt.server.GwtAtmosphereResource;
 
+/**
+ * {@link AtmosphereGwtHandler} that configures the {@link ServerPushBroadcasterFactory} to use global or per-session {@link Broadcaster}
+ * instances and retrieves a {@link Broadcaster} instances for the current {@link GwtAtmosphereResource}
+ */
 public class VaadinServerPushHandler extends AtmosphereGwtHandler {
 
     private static final String CHANNEL_PER_APPLICATION = "channelPerApplication";

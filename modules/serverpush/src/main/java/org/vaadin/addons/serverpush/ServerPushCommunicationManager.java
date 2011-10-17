@@ -24,15 +24,38 @@ import com.vaadin.terminal.gwt.server.CommunicationManager;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+/**
+ * Application manager processes changes and paints for single application
+ * instance and pushes updates to clients after all repaint requests have completed.
+ *
+ * This class handles applications running as servlets.
+ *
+ * @see com.vaadin.terminal.gwt.server.AbstractCommunicationManager
+ *
+ * @author Mark Thomas
+ * @version 1.0.6
+ * @since 1.0.0
+ */
 public class ServerPushCommunicationManager extends CommunicationManager {
 
+    /**
+     * Map containing current update threads keyed by application instance
+     */
     private final transient Map<Application, Thread> applicationThreadMap = new WeakHashMap<Application, Thread>();
 
+    /**
+     * Default constructor
+     * @param application {@link Application} instance
+     */
     public ServerPushCommunicationManager(Application application) {
         super(application);
     }
 
     @Override
+    /**
+     * Starts new thread to push updates to clients after all repaint requests are completed (e.g. once a lock on the {@link Application} can be obtained)
+     * @see com.vaadin.terminal.Paintable.RepaintRequestListener#repaintRequested(com.vaadin.terminal.Paintable.RepaintRequestEvent)
+     */
     public void repaintRequested(Paintable.RepaintRequestEvent event) {
         super.repaintRequested(event);
         final Application app = getApplication();

@@ -27,7 +27,11 @@ import javax.servlet.http.HttpSession;
 
 /**
  * {@link ApplicationServlet} that uses its own {@link WebApplicationContext} to provide {@link ServerPushCommunicationManager}
- * which pushes updates to all client on every repaint request
+ * which pushes updates to all clients on repaint request.  This servlet automatically adds an instance of {@link ServerPush} configured
+ * for the current request context path to the {@link Application}'s main window  after the application has been started.
+ * @author Mark Thomas
+ * @version 1.0.5
+ * @since 1.0.0
  */
 public class ServerPushApplicationServlet extends ApplicationServlet {
 
