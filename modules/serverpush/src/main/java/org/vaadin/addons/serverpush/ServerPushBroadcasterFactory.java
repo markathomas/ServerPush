@@ -74,6 +74,8 @@ public final class ServerPushBroadcasterFactory {
      * @param json JSON-encoded String
      */
     public void broadcastForApplication(Application application, String json) {
+        if (application == null || !application.isRunning())
+            return;
         final String sessionID = ((WebApplicationContext)application.getContext()).getHttpSession().getId();
         final Broadcaster bc = this.getBroadcaster(sessionID);
         if (bc != null)
