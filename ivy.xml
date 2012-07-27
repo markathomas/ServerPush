@@ -29,7 +29,7 @@
         <dependency force="true" org="javax.servlet" name="servletapi" rev="3.0" conf="build->default"/>
         <dependency force="true" org="org.slf4j" name="slf4j" rev="1.6.1" conf="build,atmosphere->core;samples->log4j"/>
         <dependency force="true" org="org.apache.log4j" name="log4j" rev="1.2.16" conf="samples->default"/>
-        <dependency force="true" org="org.atmosphere" name="atmosphere" rev="0.7.2" conf="build,atmosphere->gwt">
+        <dependency force="true" org="org.atmosphere" name="atmosphere" rev="0.7.2" conf="build,atmosphere->gwt,gwt-client">
             <exclude name="atmosphere-ping.*"/>
         </dependency>
     </dependencies>
