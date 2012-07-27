@@ -29,7 +29,7 @@
 
     <!-- Define some properties -->
     <property name="base.name" value="${ant.project.name}"/>
-    <property name="base.version" value="1.0.6"/>
+    <property name="base.version" value="1.0.7"/>
 
     <!-- Import build macros -->
     <import file="../../buildsettings/macros.xml"/>
